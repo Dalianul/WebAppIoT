@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% if title %}
+        <title>{{ title }} - SiteWebNanu2</title>
+    {% else %}
+        <title>Ai facut cv pe site</title>
+    {% endif %}
+    <script src="https://unpkg.com/hyperscript@2.3.0"></script>
+    <script>
+        function updateTemperature() {
+            fetch('/get_temperature')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('temperature').textContent = "Temperature: " + data + " °Celsius";
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        updateTemperature();
+        // Refresh a temperaturii la un interval de 0.1 secunde
+        setInterval(updateTemperature, 1000);
+    </script>
+</head>
+<body>
+    <h1>Hi, fellow travelers, welcome to Dalian and Hara's website!</h1>
+    <form action="/led" method="post">
+        <button type="submit" name="action" value="on">Turn On LED</button>
+        <button type="submit" name="action" value="off">Turn Off LED</button>
+    </form>
+
+    <p id="led-status">LED Status: {{ led_status }}</p>
+    <div id="temperature">Temperature: {{ temperature }} °Celsius</div>
+
+    <h1>Send Message to Microcontroller</h1>
+    <form action="/send_message" method="post">
+        <input type="text" name="message" placeholder="Enter message...">
+        <button type="submit">Send</button>
+    </form>
+    <form action="/clear_messages" method="post">
+        <button type="submit">Clear Messages</button>
+    </form>
+
+    <h2>List of Messages:</h2>
+    <table>
+        {% for message in messages %}
+        <tr>
+            <td>{{ message }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>Set LED Schedule</h2>
+<form action="/set_schedule" method="post">
+    <label for="on_time">Turn On Time (HH:MM):</label>
+    <input type="text" name="on_time" id="on_time" placeholder="HH:MM">
+    <label for="off_time">Turn Off Time (HH:MM):</label>
+    <input type="text" name="off_time" id="off_time" placeholder="HH:MM">
+    <button type="submit">Set Schedule</button>
+</form>
+ <!-- Verificarea și afișarea mesajului de set_schedule -->
+ {% if message %}
+ <p>{{ message }}</p>
+{% endif %}
+
+</body>
+</html>
