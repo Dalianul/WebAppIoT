@@ -23,16 +23,16 @@
 </head>
 <body>
     <h1>Hi, fellow travelers, welcome to Dalian and Hara's website!</h1>
-    <form action="/led" method="post">
+    <form action="/post_led" method="post">
         <button type="submit" name="action" value="on">Turn On LED</button>
         <button type="submit" name="action" value="off">Turn Off LED</button>
     </form>
 
-    <p id="led-status">LED Status: {{ led_status }}</p>
+    <p id="cloud_led_state">LED Status: {{ cloud_led_state }}</p>
     <div id="temperature">Temperature: {{ temperature }} °Celsius</div>
 
     <h1>Send Message to Microcontroller</h1>
-    <form action="/send_message" method="post">
+    <form action="/send_messages" method="post">
         <input type="text" name="message" placeholder="Enter message...">
         <button type="submit">Send</button>
     </form>

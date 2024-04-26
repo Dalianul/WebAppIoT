@@ -1,27 +1,24 @@
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import smtplib
 import time
-import requests
 from app import app 
-from flask import redirect, render_template, request, session, url_for, Response
+from flask import redirect, render_template, request, session, url_for
 import serial
-import threading
 from datetime import datetime
 
 app.secret_key = 'DH10'
 
-global led_status
-led_status = "OFF"
 global temperature
 temperature = "N/A"
+global message
+message = "NULL"
 messages = []
+global cloud_led_state
+cloud_led_state = 0
 
 @app.route('/')
 def main_page():
-    led_status = session.get('led_status', 'OFF')
+    cloud_led_state = session.get('cloud_led_state', 'OFF')
     message = session.pop('message', None)
-    return render_template('index.html', title='Home', led_status=led_status, temperature=temperature, messages=messages, message=message)
+    return render_template('index.html', title='Home', cloud_led_state=cloud_led_state, temperature=temperature, messages=messages, message=message)
 
 @app.route("/get_temperature", methods=['GET'])
 def get_temperature():
@@ -35,28 +32,41 @@ def update_temperature():
     temperature = data
     return 'Temperature updated successfully'
 
-@app.route('/led', methods=['POST'])
+@app.route('/get_led', methods=['GET'])
+def get_led():
+    global cloud_led_state
+    return str(cloud_led_state)
+
+@app.route('/post_led', methods=['POST'])
 def led_control():
-    ser = serial.Serial('COM10', 9600)
+    global cloud_led_state
     action = request.form['action']
     if action == 'on':
-        session['led_status'] = 'ON'
-        ser.write(b'A')
+        cloud_led_state = 1
+        time.sleep(3)
+        session['cloud_led_state'] = 'ON'
     elif action == 'off':
-        session['led_status'] = 'OFF'
-        ser.write(b'S')
+        cloud_led_state = 0
+        time.sleep(3)
+        session['cloud_led_state'] = 'OFF'
     return redirect(url_for('main_page'))
 
-@app.route('/send_message', methods=['POST'])
-def send_message():
-    ser = serial.Serial('COM10', 9600)
+@app.route('/get_message', methods=['GET'])
+def get_message():
+    global message
+    return message
+
+@app.route('/send_messages', methods=['POST'])
+def send_messages():
+    global message
     message = request.form['message']
-    ser.write(message.encode())
     messages.append(message)
     if message == 'A':
-        session['led_status'] = 'ON'
+        time.sleep(3)
+        session['cloud_led_state'] = 'ON'
     elif message == 'S':
-        session['led_status'] = 'OFF'
+        time.sleep(3)
+        session['cloud_led_state'] = 'OFF'
     return redirect(url_for('main_page'))
 
 @app.route('/clear_messages', methods=['POST'])
