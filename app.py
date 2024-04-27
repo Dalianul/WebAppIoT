@@ -1,9 +1,9 @@
 import time
-from app import app 
-from flask import redirect, render_template, request, session, url_for
+from flask import Flask, redirect, render_template, request, session, url_for
 import serial
 from datetime import datetime
 
+app = Flask(__name__)
 app.secret_key = 'DH10'
 
 global temperature
@@ -13,6 +13,8 @@ message = "NULL"
 messages = []
 global cloud_led_state
 cloud_led_state = 0
+global message_valid
+message_valid = 0
 
 @app.route('/')
 def main_page():
@@ -53,12 +55,16 @@ def led_control():
 
 @app.route('/get_message', methods=['GET'])
 def get_message():
-    global message
-    return message
+    global message, message_valid
+    if message_valid == 1:
+        message_valid = 0
+        return message
+    else:
+        return "NULL"
 
 @app.route('/send_messages', methods=['POST'])
 def send_messages():
-    global message
+    global message, message_valid
     message = request.form['message']
     messages.append(message)
     if message == 'A':
@@ -67,6 +73,7 @@ def send_messages():
     elif message == 'S':
         time.sleep(3)
         session['cloud_led_state'] = 'OFF'
+    message_valid = 1
     return redirect(url_for('main_page'))
 
 @app.route('/clear_messages', methods=['POST'])

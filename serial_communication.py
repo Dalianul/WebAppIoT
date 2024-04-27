@@ -46,6 +46,7 @@ def check_cloud_led_state():
         response = requests.get("http://localhost:5000/get_led")
         if response.status_code == 200:
             cloud_led_state = int(response.text)
+            print("Led state from cloud: "+ str(cloud_led_state))
             return cloud_led_state
         else:
             print(f"Failed to get cloud LED state. Status code: {response.status_code}")
@@ -59,6 +60,7 @@ def check_cloud_message():
         response = requests.get("http://localhost:5000/get_message")
         if response.status_code == 200:
             message = response.text
+            print("Message from cloud: "+ str(message))
             return message
         else:
             print(f"Failed to get cloud message. Status code: {response.status_code}")
@@ -88,21 +90,13 @@ def read_serial_and_send_data():
         if send_message == 1:
             send_message = 0
 
-        # Update the LED state based on the message
-        if message == 'A':
+        # Update the LED state based on the cloud LED state
+        if cloud_led_state == 1:
             ser.write(b'A')  # Turn on the LED
-            print("LED turned ON - message A")
-        elif message == 'S':
+            print("LED turned ON - cloud")
+        elif cloud_led_state == 0:
             ser.write(b'S')  # Turn off the LED
-            print("LED turned OFF - message S")
-        else:
-            # Update the LED state based on the cloud LED state
-            if cloud_led_state == 1:
-                ser.write(b'A')  # Turn on the LED
-                print("LED turned ON - cloud")
-            elif cloud_led_state == 0:
-                ser.write(b'S')  # Turn off the LED
-                print("LED turned OFF - cloud")
+            print("LED turned OFF - cloud")
 
         if ser.in_waiting > 0:
             data = ser.readline().decode('utf-8').strip()
