@@ -7,10 +7,9 @@ import time
 
 global send_message
 send_message = 0
-global on_time, off_time, on_time_str, off_time_str
 
-test_url = "http://localhost:5000/"
-azure_rul = "https://azure-webapp-iot.azurewebsites.net/"
+local_url = "http://localhost:5000/"
+azure_url = "https://azure-webapp-iot.azurewebsites.net/"
 
 COM_PORT = "COM10"
 BAUD_RATE = 9600
@@ -46,7 +45,7 @@ def send_notification():
 
 def check_cloud_led_state():
     try:
-        response = requests.get("https://azure-webapp-iot.azurewebsites.net/get_led")
+        response = requests.get(azure_url + "get_led")
         if response.status_code == 200:
             cloud_led_state = int(response.text)
             print("Led state from cloud: "+ str(cloud_led_state))
@@ -60,7 +59,7 @@ def check_cloud_led_state():
 
 def check_cloud_message():
     try:
-        response = requests.get("https://azure-webapp-iot.azurewebsites.net/get_message")
+        response = requests.get(azure_url + "get_message")
         if response.status_code == 200:
             message = response.text
             print("Message from cloud: "+ str(message))
@@ -74,7 +73,7 @@ def check_cloud_message():
 
 def check_cloud_schedule():
     try:
-        response = requests.get("https://azure-webapp-iot.azurewebsites.net/get_schedule")
+        response = requests.get(azure_url + "get_schedule")
         if response.status_code == 200:
             # Check if response content is empty
             if not response.content:
@@ -94,7 +93,7 @@ def check_cloud_schedule():
 
 
 def read_serial_and_send_data():
-    global send_message, cloud_led_state, schedule, on_time, off_time, on_time_str, off_time_str
+    global send_message, cloud_led_state, schedule
     last_message = ""  # Initialize a variable to store the last message sent  # Initialize the serial LED state
     while True:
 
@@ -126,7 +125,7 @@ def read_serial_and_send_data():
             if data.startswith("Temperatura celsius: "):
                 temperature = data.split(": ")[1]
                 try:
-                    response = requests.post("https://azure-webapp-iot.azurewebsites.net/update_temperature", data={"temperature": temperature})
+                    response = requests.post(azure_url + "update_temperature", data={"temperature": temperature})
                     if response.status_code == 200:
                         print("Temperature data sent successfully to the Azure web app.")
                     else:
