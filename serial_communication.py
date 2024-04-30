@@ -1,7 +1,6 @@
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
-from flask import jsonify, session
 import serial
 import requests
 import time
@@ -47,7 +46,7 @@ def send_notification():
 
 def check_cloud_led_state():
     try:
-        response = requests.get("http://localhost:5000/get_led")
+        response = requests.get("https://azure-webapp-iot.azurewebsites.net/get_led")
         if response.status_code == 200:
             cloud_led_state = int(response.text)
             print("Led state from cloud: "+ str(cloud_led_state))
@@ -61,7 +60,7 @@ def check_cloud_led_state():
 
 def check_cloud_message():
     try:
-        response = requests.get("http://localhost:5000/get_message")
+        response = requests.get("https://azure-webapp-iot.azurewebsites.net/get_message")
         if response.status_code == 200:
             message = response.text
             print("Message from cloud: "+ str(message))
@@ -72,7 +71,28 @@ def check_cloud_message():
     except Exception as e:
         print("Error:", e)
         return None
-    
+
+def check_cloud_schedule():
+    try:
+        response = requests.get("https://azure-webapp-iot.azurewebsites.net/get_schedule")
+        if response.status_code == 200:
+            # Check if response content is empty
+            if not response.content:
+                print("Error: Empty response from server")
+                return None
+            
+            schedule_data = response.json()
+            print("Schedule from cloud: " + str(schedule_data))
+            return schedule_data
+        else:
+            print(f"Failed to get cloud schedule. Status code: {response.status_code}")
+            return None
+    except Exception as e:
+        print("Insert data for setting the LED schedule,", e)
+        return None
+
+
+
 def read_serial_and_send_data():
     global send_message, cloud_led_state, schedule, on_time, off_time, on_time_str, off_time_str
     last_message = ""  # Initialize a variable to store the last message sent  # Initialize the serial LED state
@@ -81,6 +101,7 @@ def read_serial_and_send_data():
         # Check the LED state from the cloud and the message state
         cloud_led_state = check_cloud_led_state()
         message = check_cloud_message()
+        schedule = check_cloud_schedule()
 
         # Send the message to the Arduino only if it's different from the last one
         if message != "NULL" and message != last_message:
@@ -105,7 +126,7 @@ def read_serial_and_send_data():
             if data.startswith("Temperatura celsius: "):
                 temperature = data.split(": ")[1]
                 try:
-                    response = requests.post("http://localhost:5000/update_temperature", data={"temperature": temperature})
+                    response = requests.post("https://azure-webapp-iot.azurewebsites.net/update_temperature", data={"temperature": temperature})
                     if response.status_code == 200:
                         print("Temperature data sent successfully to the Azure web app.")
                     else:

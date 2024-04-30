@@ -71,15 +71,7 @@ void setup(void)
 
   for (int i = 0; i < maxMessages; i++) {
     messages[i] = readStringFromEEPROM(i * messageSize);
-    // Serial.print("Message ");
-    // Serial.print(i);
-    // Serial.print(": ");
-    // Serial.println(messages[i]);
   }
-
-  // // Se afișează ultimul mesaj pentru a fi tratat ca stare inițială a LED-ului
-  // Serial.print("Last Message: ");
-  // Serial.println(messages[maxMessages - 1]);
 
   if (messages[maxMessages - 1] == "A") {
     digitalWrite(internalLedPin, HIGH);

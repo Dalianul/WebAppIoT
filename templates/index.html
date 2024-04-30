@@ -28,7 +28,7 @@
         <button type="submit" name="action" value="off">Turn Off LED</button>
     </form>
 
-    <p id="cloud_led_state">LED Status: {{ cloud_led_state }}</p>
+    <p>LED State: {% if cloud_led_state == 1 %}ON{% else %}OFF{% endif %}</p>
     <div id="temperature">Temperature: {{ temperature }} °Celsius</div>
 
     <h1>Send Message to Microcontroller</h1>
