@@ -136,8 +136,6 @@ def set_schedule():
     on_time_str = request.form['on_time']
     off_time_str = request.form['off_time']
     
-    # Stocarea mesajului în sesiune
-    # session['message'] = f'Led setat pentru aprindere la ora {on_time_str} și pentru stingere la ora {off_time_str}.'
     messages.append(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S, ")) + "Mesaj: " + "Led setat pentru aprindere la ora " + str(on_time_str) + " și pentru stingere la ora "+ str(off_time_str))
     schedule_valid = 1
     return redirect(url_for('main_page'))
