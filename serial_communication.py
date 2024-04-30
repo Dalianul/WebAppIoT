@@ -1,13 +1,17 @@
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
-from flask import session
+from flask import jsonify, session
 import serial
 import requests
 import time
 
 global send_message
 send_message = 0
+global on_time, off_time, on_time_str, off_time_str
+
+test_url = "http://localhost:5000/"
+azure_rul = "https://azure-webapp-iot.azurewebsites.net/"
 
 COM_PORT = "COM10"
 BAUD_RATE = 9600
@@ -19,7 +23,7 @@ def send_notification():
     SMTP_PORT = 587
     SMTP_USERNAME = 'dalian.ardelean@gmail.com'
     SMTP_PASSWORD = 'twsj pdyk zvcn aaos'
-    RECIPIENT_EMAIL = 'ardeleanharalambie21@gmail.com'
+    RECIPIENT_EMAIL = 'dalian.ardelean@gmail.com'
 
     message = MIMEMultipart()
     message['From'] = SMTP_USERNAME
@@ -68,12 +72,11 @@ def check_cloud_message():
     except Exception as e:
         print("Error:", e)
         return None
-
+    
 def read_serial_and_send_data():
-    global send_message, cloud_led_state
+    global send_message, cloud_led_state, schedule, on_time, off_time, on_time_str, off_time_str
     last_message = ""  # Initialize a variable to store the last message sent  # Initialize the serial LED state
     while True:
-        #print("send_message_flag = " + str(send_message))
 
         # Check the LED state from the cloud and the message state
         cloud_led_state = check_cloud_led_state()
@@ -82,14 +85,13 @@ def read_serial_and_send_data():
         # Send the message to the Arduino only if it's different from the last one
         if message != "NULL" and message != last_message:
             ser.write(message.encode())  # Send the message
-            print(message)
             last_message = message
             send_message = 1
 
         # Reset the message send flag after it's sent
         if send_message == 1:
             send_message = 0
-
+        
         # Update the LED state based on the cloud LED state
         if cloud_led_state == 1:
             ser.write(b'A')  # Turn on the LED
@@ -111,6 +113,7 @@ def read_serial_and_send_data():
                 except Exception as e:
                     print("Error sending temperature data:", e)
             elif data == "Inundatie detectata!":
+                print("Alert, Flood detected !")
                 send_notification()
        
 if __name__ == "__main__":

@@ -11,7 +11,7 @@
 #define internalLedPin 13
 #define waterSensorPin A0
 
-const int waterThreshold = 400; 
+const int waterThreshold = 200; 
 bool inundatieDetectata = false;
 
 OneWire oneWire(ONE_WIRE_BUS);
@@ -89,13 +89,18 @@ void setup(void)
 void loop(void){ 
   DateTime now = rtc.now();
   currentHour = now.hour();
+  currentMinute = now.minute();
   
    // Formatare minute sa inceapa cu 0 daca minutul e mai mic de 10 ( ex: in loc de timpul: 238 sa afiseze 2308)
   char formattedMinutes[3];
   sprintf(formattedMinutes, "%02d", now.minute());
 
+  // Formatare ora să înceapă cu 0 dacă ora e mai mică de 10 și să aibă două cifre
+  char formattedHour[3];
+  sprintf(formattedHour, "%02d", now.hour());
+
   Serial.print("\n");
-  Serial.print(currentHour);
+  Serial.print(formattedHour);
   Serial.print(formattedMinutes);
   sensors.requestTemperatures(); 
   Serial.print("\nTemperatura celsius: ");
