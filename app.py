@@ -86,6 +86,7 @@ def clear_messages():
 @app.route('/get_schedule', methods=['GET'])
 def get_schedule():
     global on_time_str, off_time_str, schedule_valid,cloud_led_state
+    
     # Splitting the on_time_str into hours and minutes
     on_time_parts = on_time_str.split(':')
     on_hour = int(on_time_parts[0])
