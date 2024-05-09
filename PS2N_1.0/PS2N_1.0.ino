@@ -3,13 +3,13 @@
 #include <EEPROM.h>
 #include <RTClib.h>
 
-#define ce_pin 2
-#define sck_pin 5
-#define io_pin 4
+#define ce_pin 2  //chip enable 
+#define sck_pin 5 // serial clock
+#define io_pin 4  //input/output pin
 
-#define ONE_WIRE_BUS 8
-#define internalLedPin 13
-#define waterSensorPin A0
+#define ONE_WIRE_BUS 8 //pin pentru senzor temperatura 
+#define internalLedPin 13 //pin led intern de pe placuta 
+#define waterSensorPin A0 //pin pentru senzorul de temperatura 
 
 const int waterThreshold = 200; 
 bool inundatieDetectata = false;
@@ -21,7 +21,7 @@ DallasTemperature sensors(&oneWire);
 DS1302 rtc(ce_pin, sck_pin, io_pin);
 char buf[20];
 
-bool scheduleSet = false; // Variabilă de stare pentru programul setat
+bool scheduleSet = false;
 int onHour = 0;
 int onMinute = 0;
 int offHour = 0;
@@ -30,10 +30,10 @@ int currentHour = 0;
 int currentMinute = 0;
 
 const int maxMessages = 10;
-const int messageSize = 2; // Dimensiunea fiecărui mesaj (A sau S)
+const int messageSize = 2;
 
-String messages[maxMessages]; // Array pentru stocarea mesajelor
-int messageCount = 0; // Contor pentru numărul de mesaje stocate
+String messages[maxMessages]; 
+int messageCount = 0;
 
 void writeStringToEEPROM(int addrOffset, const String &strToWrite)
 {
@@ -65,7 +65,6 @@ void setup(void)
   Serial.begin(9600);
   sensors.begin();
   pinMode(internalLedPin, OUTPUT);
- //digitalWrite(internalLedPin, LOW);
   rtc.begin();
   rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
@@ -83,7 +82,7 @@ void loop(void){
   currentHour = now.hour();
   currentMinute = now.minute();
   
-   // Formatare minute sa inceapa cu 0 daca minutul e mai mic de 10 ( ex: in loc de timpul: 238 sa afiseze 2308)
+  // Formatare minute sa inceapa cu 0 daca minutul e mai mic de 10 ( ex: in loc de timpul: 238 sa afiseze 2308)
   char formattedMinutes[3];
   sprintf(formattedMinutes, "%02d", now.minute());
 
@@ -110,22 +109,16 @@ void loop(void){
     inundatieDetectata = false;
   }
 
-  // Verificarea ciclică a programului setat
   if (scheduleSet) {
-    // Verificăm dacă este momentul de aprindere
     if (currentHour == onHour && currentMinute == onMinute) {
       digitalWrite(internalLedPin, HIGH);
-      //Serial.println("LED-ul a fost aprins.");
     } 
-    // Verificăm dacă este momentul de stingere
     else if (currentHour == offHour && currentMinute == offMinute) {
       digitalWrite(internalLedPin, LOW);
-      //Serial.println("LED-ul a fost stins.");
       scheduleSet = false;
     }
   }
 
-  // Verificăm dacă există date disponibile pe portul serial
   if (Serial.available() > 0) {
     String input = Serial.readStringUntil('\n');
     if (input == "A" || input == "S") {
@@ -151,13 +144,11 @@ void loop(void){
     else if (input.startsWith("SET_SCHEDULE")) {
       input.remove(0, 12); // Elimină "SET_SCHEDULE" de la început
 
-      // Actualizăm variabilele globale pentru programul setat
       onHour = input.substring(0, 2).toInt();
       onMinute = input.substring(3, 5).toInt();
       offHour = input.substring(6, 8).toInt();
       offMinute = input.substring(9, 11).toInt();
 
-      // Afișăm programul setat în consola serială
       Serial.print("\nProgram setat: Pornire la ");
       Serial.print(onHour);
       Serial.print(":");
@@ -167,7 +158,7 @@ void loop(void){
       Serial.print(":");
       Serial.println(offMinute);
 
-      scheduleSet = true; // Setăm variabila de stare la true
+      scheduleSet = true;
     }
   }
  delay(100);

@@ -21,14 +21,13 @@ def send_notification():
     SMTP_PORT = 587
     SMTP_USERNAME = 'dalian.ardelean@gmail.com'
     SMTP_PASSWORD = 'twsj pdyk zvcn aaos'
-    RECIPIENT_EMAIL = 'dalian.ardelean@gmail.com'
+    RECIPIENT_EMAIL = 'ardeleanharalambie21@gmail.com'
 
     message = MIMEMultipart()
     message['From'] = SMTP_USERNAME
     message['To'] = RECIPIENT_EMAIL
     message['Subject'] = 'Alertă! Inundație detectată!'
 
-    # Construct the message body
     body = "A fost detectată o inundație la data și ora: " + time.strftime("%Y-%m-%d %H:%M:%S")
     message.attach(MIMEText(body, 'plain'))
 
@@ -75,7 +74,6 @@ def check_cloud_schedule():
     try:
         response = requests.get(azure_url + "get_schedule")
         if response.status_code == 200:
-            # Check if response content is empty
             if not response.content:
                 print("Error: Empty response from server")
                 return None
@@ -94,30 +92,27 @@ def check_cloud_schedule():
 
 def read_serial_and_send_data():
     global send_message, cloud_led_state, schedule
-    last_message = ""  # Initialize a variable to store the last message sent  # Initialize the serial LED state
+    last_message = "" 
     while True:
 
-        # Check the LED state from the cloud and the message state
         cloud_led_state = check_cloud_led_state()
         message = check_cloud_message()
         schedule = check_cloud_schedule()
 
-        # Send the message to the Arduino only if it's different from the last one
         if message != "NULL" and message != last_message:
-            ser.write(message.encode())  # Send the message
+            ser.write(message.encode())  
             last_message = message
             send_message = 1
 
-        # Reset the message send flag after it's sent
+        # Reset the send_message flag after it's sent
         if send_message == 1:
             send_message = 0
         
-        # Update the LED state based on the cloud LED state
         if cloud_led_state == 1:
-            ser.write(b'A')  # Turn on the LED
+            ser.write(b'A') 
             print("LED turned ON - cloud")
         elif cloud_led_state == 0:
-            ser.write(b'S')  # Turn off the LED
+            ser.write(b'S') 
             print("LED turned OFF - cloud")
 
         if ser.in_waiting > 0:
