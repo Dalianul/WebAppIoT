@@ -1,7 +1,8 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <EEPROM.h>
-#include <RTClib.h>
+#include <RTClib.h> //TOT CE TINE DE RTC E REDUNDANT PE PARTE DE CLOUD, DOAR DACA VREI SA IMPLEMENTEZI LOCAL
+                    //ASA CA AR FI BINE STERS TOATE PARTILE DE COD CE CONTIN INFORMATII DESPRE REAL TIME CLOCK MODULE
 
 #define ce_pin 2  //chip enable 
 #define sck_pin 5 // serial clock
@@ -9,7 +10,7 @@
 
 #define ONE_WIRE_BUS 8 //pin pentru senzor temperatura 
 #define internalLedPin 13 //pin led intern de pe placuta 
-#define waterSensorPin A0 //pin pentru senzorul de temperatura 
+#define waterSensorPin A0 //pin pentru senzorul de apa 
 
 const int waterThreshold = 200; 
 bool inundatieDetectata = false;
@@ -74,6 +75,9 @@ void setup(void)
 
   if (messages[maxMessages - 1] == "A") {
     digitalWrite(internalLedPin, HIGH);
+  }
+  else if (messages[maxMessages - 1] == "S"){
+    digitalWrite(internalLedPin, LOW);
   }
 }
 
