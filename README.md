@@ -12,3 +12,5 @@ Install the python requirements: python -m pip install -r requirements.txt.
 Deploy the main folder (which contains app.py, templates and requirements.txt) to Azure.
 Change the URL inside serial_communication.py to your azure url after deployment
 Run: python serial_communication.py.
+
+Proiect de echipa realizat de studentii ARDELEAN Dalian si ARDELEAN Haralambie!

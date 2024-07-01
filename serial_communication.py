@@ -21,7 +21,7 @@ def send_notification():
     SMTP_PORT = 587
     SMTP_USERNAME = 'dalian.ardelean@gmail.com'
     SMTP_PASSWORD = 'twsj pdyk zvcn aaos'
-    RECIPIENT_EMAIL = 'dalian.ardelean@gmail.com'
+    RECIPIENT_EMAIL = 'ardeleanharalambie21@gmail.com'
 
     message = MIMEMultipart()
     message['From'] = SMTP_USERNAME
