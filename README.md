@@ -13,4 +13,4 @@ Deploy the main folder (which contains app.py, templates and requirements.txt) t
 Change the URL inside serial_communication.py to your azure url after deployment
 Run: python serial_communication.py.
 
-Proiect de echipa realizat de studentii Ardelean Dalian si Ardelean Haralambie!
+Proiect de echipa realizat de studentii ARDELEAN Dalian si ARDELEAN Haralambie!
